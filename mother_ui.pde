@@ -16,11 +16,18 @@ boolean patchList = true;
 boolean showInfoBar = true;
 boolean enablePatchSub = false;
 boolean patchLoaded = false;
+boolean lineMode = true;
 
 File[] patches;
 int patchIndex = 0;
 int patchSelected = 0;
 int patchLoadedIndex = -1;
+
+boolean disableKnob1Callback = false;
+boolean disableKnob2Callback = false;
+boolean disableKnob3Callback = false;
+boolean disableKnob4Callback = false;
+boolean disableVolumeCallback = false;
 
 void setup() {
   size(480,320);
@@ -39,9 +46,14 @@ void setup() {
   myRemoteLocation = new NetAddress("127.0.0.1",4000);
   
   background(0);
+  fill(0, 130, 130);
+  noStroke();
+  rect(0, 212, 480, 320);
+  rect(384, 0, 480, 212);
   
   createGUI();
   aux.fireAllEvents(true);
+  select.fireAllEvents(true);
   
   patches = listFile(ROOT);
   drawPatches();
@@ -112,6 +124,8 @@ void handleOscEvent(OscMessage theOscMessage) {
     }
   } else if(theOscMessage.checkAddrPattern("/gohome")) {
     patchListMode();
+  } else if(theOscMessage.checkAddrPattern("/knobs")) {
+    drawKnobs(theOscMessage);
   } else {
     /* print the address pattern and the typetag of the received OscMessage */
     print("### received an osc message.");
@@ -121,6 +135,7 @@ void handleOscEvent(OscMessage theOscMessage) {
 }
 
 void patchListMode() {
+  println("patchListMode");
   patchList = true;
   drawPatches();
 }

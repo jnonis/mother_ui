@@ -34,8 +34,8 @@ void sendEncoderTurn(int value) {
 }
 
 /** Send Encoder pressed event using OSC. */
-void sendEncoderButton() {
+void sendEncoderButton(int value) {
   OscMessage myMessage = new OscMessage("/encoder/button");
-  myMessage.add(1);
+  myMessage.add(value);
   oscP5.send(myMessage, myRemoteLocation);
 }

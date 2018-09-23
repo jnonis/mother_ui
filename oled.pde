@@ -1,3 +1,4 @@
+static final int WIDTH = 384;
 
 int getScladeValue(int value) {
   return round(value * SCALE);
@@ -13,12 +14,17 @@ void drawLine(OscMessage theOscMessage) {
     }
     text.append(args[i].toString());
   }
+  if (!lineMode) {
+    drawGClear();
+    lineMode = true;
+    showInfoBar = true;
+  }
   drawLine(index, text.toString());
 }
 
 void drawLine(int index, String text) {
   fill(0,0,0);
-  rect(0, getScladeValue((index * 10) + 3), 480, getScladeValue(9));
+  rect(0, getScladeValue((index * 10) + 3), WIDTH, getScladeValue(9));
   fill(255,255,255);
   textSize(getScladeValue(8));
   text(text, getScladeValue(5), getScladeValue((index + 1) * 10));
@@ -32,7 +38,7 @@ void drawInvertLine(OscMessage theOscMessage) {
 void drawInvertLine(int index) {
   int x1 = 0;
   int y1 = getScladeValue((index * 10) + 3);
-  int x2 = 480;
+  int x2 = WIDTH;
   int y2 = getScladeValue(9);
   loadPixels();
   for (int i = x1; i < x1 + x2; i++) {
@@ -86,7 +92,7 @@ void drawLed(OscMessage theOscMessage) {
       fill(0,0,0);
       break;
   }  
-  rect(0, 320 - 128, 480, 20);
+  rect(0, 320 - 128, WIDTH, 20);
 }
 
 void drawVumeter(OscMessage theOscMessage) {
@@ -130,7 +136,7 @@ void drawVumeter(OscMessage theOscMessage) {
   }
 
   fill(0,0,0);
-  rect(0, getScladeValue(3), 480, getScladeValue(9));
+  rect(0, getScladeValue(3), WIDTH, getScladeValue(9));
   fill(255,255,255);
   textSize(getScladeValue(8));
   text(text.toString(), getScladeValue(5), getScladeValue(10));
@@ -145,7 +151,13 @@ void drawGShowInfoBar(OscMessage theOscMessage) {
 }
 
 void drawGClear() {
-  background(0);
+  println("drawGClear");
+  if (lineMode) {
+    lineMode = false;
+  }
+  fill(0);
+  noStroke();
+  rect(0, 0, 384, 192);
 }
 
 void drawGSetPixel(OscMessage theOscMessage) {
@@ -304,4 +316,29 @@ void drawGBox(OscMessage theOscMessage) {
   rect(x1, y1, x2, y2);
   stroke(0);
   fill(0,255);
+}
+
+void drawKnobs(OscMessage theOscMessage) {
+  disableKnob1Callback = true;
+  disableKnob2Callback = true;
+  disableKnob3Callback = true;
+  disableKnob4Callback = true;
+  disableVolumeCallback = true;
+  knob1.setValue(getFloatFromOscArg(theOscMessage, 0));
+  knob2.setValue(getFloatFromOscArg(theOscMessage, 1));
+  knob3.setValue(getFloatFromOscArg(theOscMessage, 2));
+  knob4.setValue(getFloatFromOscArg(theOscMessage, 3));
+  volume.setValue(getFloatFromOscArg(theOscMessage, 4));
+}
+
+float getFloatFromOscArg(OscMessage theOscMessage, int index) {
+  byte[] types = theOscMessage.getTypetagAsBytes();
+  float value;
+  // 105 = 'i'
+  if (105 == types[index]) {
+    value = theOscMessage.get(index).intValue();
+  } else {
+    value = theOscMessage.get(index).floatValue();
+  }
+  return value;
 }
