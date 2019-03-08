@@ -32,6 +32,7 @@ boolean disableKnob2Callback = false;
 boolean disableKnob3Callback = false;
 boolean disableKnob4Callback = false;
 boolean disableVolumeCallback = false;
+boolean disableExprCallback = false;
 
 void setup() {
   //size(320,480);

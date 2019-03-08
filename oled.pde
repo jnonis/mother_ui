@@ -335,12 +335,13 @@ void drawKnobs(OscMessage theOscMessage) {
   disableKnob3Callback = true;
   disableKnob4Callback = true;
   disableVolumeCallback = true;
+  disableExprCallback = true;
   knob1.setValue(getFloatFromOscArg(theOscMessage, 0));
   knob2.setValue(getFloatFromOscArg(theOscMessage, 1));
   knob3.setValue(getFloatFromOscArg(theOscMessage, 2));
   knob4.setValue(getFloatFromOscArg(theOscMessage, 3));
   volume.setValue(getFloatFromOscArg(theOscMessage, 4));
-  println("volume: " + getFloatFromOscArg(theOscMessage, 4));
+  expr.setValue(getFloatFromOscArg(theOscMessage, 5));
 }
 
 float getFloatFromOscArg(OscMessage theOscMessage, int index) {

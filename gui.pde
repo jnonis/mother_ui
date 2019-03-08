@@ -55,7 +55,11 @@ public void aux_click1(GButton source, GEvent event) { //_CODE_:aux:269587:
 } //_CODE_:aux:269587:
 
 public void fs_click1(GButton source, GEvent event) { //_CODE_:fs:706957:
-  println("button2 - GButton >> GEvent." + event + " @ " + millis());
+  if (event == GEvent.PRESSED) {
+    sendFs(100);
+  } else if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
+    sendFs(0);
+  }
 } //_CODE_:fs:706957:
 
 public void up_click1(GButton source, GEvent event) { //_CODE_:up:717920:
@@ -108,11 +112,17 @@ public void select_click1(GButton source, GEvent event) { //_CODE_:select:600355
 } //_CODE_:select:600355:
 
 public void expr_turn1(CustomGKnob source, GEvent event) { //_CODE_:expr:359660:
-  println("knob5 - GKnob >> GEvent." + event + " @ " + millis());
+  if (!disableExprCallback) {
+    sendKnobs();
+  } else {
+    disableExprCallback = false;
+  }
 } //_CODE_:expr:359660:
 
 public void load_click1(GButton source, GEvent event) { //_CODE_:load:838972:
-  println("button1 - GButton >> GEvent." + event + " @ " + millis());
+  if (event == GEvent.PRESSED) {
+    sendLoad();
+  }
 } //_CODE_:load:838972:
 
 public void volume_turn1(CustomGKnob source, GEvent event) { //_CODE_:volume:299973:
@@ -124,7 +134,9 @@ public void volume_turn1(CustomGKnob source, GEvent event) { //_CODE_:volume:299
 } //_CODE_:volume:299973:
 
 public void save_click1(GButton source, GEvent event) { //_CODE_:save_button:799425:
-  println("button1 - GButton >> GEvent." + event + " @ " + millis());
+  if (event == GEvent.PRESSED) {
+    sendSave();
+  }
 } //_CODE_:save_button:799425:
 
 

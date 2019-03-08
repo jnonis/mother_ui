@@ -14,7 +14,7 @@ void sendKnobs() {
   myMessage.add(knob3.getValueI());
   myMessage.add(knob4.getValueI());
   myMessage.add(volume.getValueI());
-  // TODO exp.
+  myMessage.add(expr.getValueI());
   oscP5.send(myMessage, myRemoteLocation);
 }
 
@@ -30,9 +30,8 @@ void sendAux(int value) {
 /** Send FS state using OSC. */
 void sendFs(int value) {
   println("Send FS: " + value);
-  OscMessage myMessage = new OscMessage("/key");
-  myMessage.add(1);
-  myMessage.add(value);
+  OscMessage myMessage = new OscMessage("/fs");
+  myMessage.add(100 - value);
   oscP5.send(myMessage, myRemoteLocation);
 }
 
@@ -47,5 +46,19 @@ void sendEncoderTurn(int value) {
 void sendEncoderButton(int value) {
   OscMessage myMessage = new OscMessage("/encoder/button");
   myMessage.add(value);
+  oscP5.send(myMessage, myRemoteLocation);
+}
+
+/** Send load state event using OSC. */
+void sendLoad() {
+  OscMessage myMessage = new OscMessage("/loadState");
+  myMessage.add(1);
+  oscP5.send(myMessage, myRemoteLocation);
+}
+
+/** Send save state event using OSC. */
+void sendSave() {
+  OscMessage myMessage = new OscMessage("/saveState");
+  myMessage.add(1);
   oscP5.send(myMessage, myRemoteLocation);
 }
