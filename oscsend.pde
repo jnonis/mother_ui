@@ -20,8 +20,18 @@ void sendKnobs() {
 
 /** Send Aux state using OSC. */
 void sendAux(int value) {
+  println("Send AUX: " + value);
   OscMessage myMessage = new OscMessage("/key");
   myMessage.add(0);
+  myMessage.add(value);
+  oscP5.send(myMessage, myRemoteLocation);
+}
+
+/** Send FS state using OSC. */
+void sendFs(int value) {
+  println("Send FS: " + value);
+  OscMessage myMessage = new OscMessage("/key");
+  myMessage.add(1);
   myMessage.add(value);
   oscP5.send(myMessage, myRemoteLocation);
 }

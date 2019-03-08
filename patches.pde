@@ -23,12 +23,18 @@ File getMainPd(File patchDir) {
 File[] listFile(String dir) {
   File file = new File(dir);
   if (file.exists() && file.isDirectory()) {
-    return file.listFiles(new FileFilter() {
+    File[] files = file.listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
         return pathname.isDirectory() && !pathname.getName().startsWith(".");
       }
     });
+    Arrays.sort(files, new Comparator<File>() {
+      public int compare(File a, File b) { 
+        return a.getName().compareTo(b.getName()); 
+      } 
+    });
+    return files;
   } else {
     return new File[0];
   }

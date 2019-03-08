@@ -1,4 +1,5 @@
-static final int WIDTH = 384;
+static final int WIDTH = 240; //384;
+static final int HEIGHT = 128; //384;
 
 int getScladeValue(int value) {
   return round(value * SCALE);
@@ -15,16 +16,26 @@ void drawLine(OscMessage theOscMessage) {
     text.append(args[i].toString());
   }
   if (!lineMode) {
-    drawGClear();
+    fill(0);
+    noStroke();
+    rect(0, 0, WIDTH, HEIGHT);
+    println("Changing to line mode");
     lineMode = true;
     showInfoBar = true;
+    
   }
   drawLine(index, text.toString());
 }
 
 void drawLine(int index, String text) {
   fill(0,0,0);
-  rect(0, getScladeValue((index * 10) + 3), WIDTH, getScladeValue(9));
+  //rect(0, getScladeValue((index * 10) + 3), WIDTH, getScladeValue(9));
+  if (index == 1) {
+    rect(0, getScladeValue(8), WIDTH, getScladeValue(5));
+  } else if (index == 5) {
+    rect(0, getScladeValue(60), WIDTH, getScladeValue(3));
+  }
+  rect(0, getScladeValue((index * 10) + 2), WIDTH, getScladeValue(10));
   fill(255,255,255);
   textSize(getScladeValue(8));
   text(text, getScladeValue(5), getScladeValue((index + 1) * 10));
@@ -92,7 +103,7 @@ void drawLed(OscMessage theOscMessage) {
       fill(0,0,0);
       break;
   }  
-  rect(0, 320 - 128, WIDTH, 20);
+  rect(192, 136, 48, 48);
 }
 
 void drawVumeter(OscMessage theOscMessage) {
@@ -109,37 +120,37 @@ void drawVumeter(OscMessage theOscMessage) {
   int outR = theOscMessage.get(3).intValue();
   if (outR < 0) outR = 0;
 
-  String text = "I";
-  for (int i = 0; i < 11; i++) {
-      if (inL > i && inR > i) {
-        text = text + char(219);
-      } else if (inL > i) {
-        text = text + char(223);
-      } else if (inR > i) {
-        text = text + char(220);
-      } else {
-        text = text + ":";
-      }
-  }
-
-  text = text + " O";
-  for (int i = 0; i < 11; i++) {
-      if (outL > i && outR > i) {
-        text = text + char(219);
-      } else if (outL > i) {
-        text = text + char(223);
-      } else if (outR > i) {
-        text = text + char(220);
-      } else {
-        text = text + ":";
-      }
-  }
-
   fill(0,0,0);
-  rect(0, getScladeValue(3), WIDTH, getScladeValue(9));
+  rect(0, 0, WIDTH, getScladeValue(8));
   fill(255,255,255);
-  textSize(getScladeValue(8));
-  text(text.toString(), getScladeValue(5), getScladeValue(10));
+ 
+  textSize(getScladeValue(6));
+  text("I", getScladeValue(5), getScladeValue(7));
+  int offset = 64;
+  text("O", getScladeValue(offset), getScladeValue(7));
+  
+  for (int i = 0; i < 11; i++) {
+    if (inL > i) {
+      rect(getScladeValue(10 + (3 * i)), getScladeValue(2), getScladeValue(2), getScladeValue(2));
+    } else {
+      rect(getScladeValue(10 + (3 * i)), getScladeValue(3), getScladeValue(1), getScladeValue(1));
+    }
+    if (inR > i) {
+      rect(getScladeValue(10 + (3 * i)), getScladeValue(6), getScladeValue(2), getScladeValue(2));
+    } else {
+      rect(getScladeValue(10 + (3 * i)), getScladeValue(7), getScladeValue(1), getScladeValue(1));
+    }
+    if (outL > i) {
+      rect(getScladeValue(offset + 10 + (3 * i)), getScladeValue(2), getScladeValue(2), getScladeValue(2));
+    } else {
+      rect(getScladeValue(offset + 10 + (3 * i)), getScladeValue(3), getScladeValue(1), getScladeValue(1));
+    }
+    if (outR > i) {
+      rect(getScladeValue(offset + 10 + (3 * i)), getScladeValue(6), getScladeValue(2), getScladeValue(2));
+    } else {
+      rect(getScladeValue(offset + 10 + (3 * i)), getScladeValue(7), getScladeValue(1), getScladeValue(1));
+    }
+  }
 }
 
 void drawGShowInfoBar(OscMessage theOscMessage) {
@@ -170,7 +181,7 @@ void drawGSetPixel(OscMessage theOscMessage) {
   }
   int scaledx = getScladeValue(x);
   int scaledy = getScladeValue(y);
-  rect(scaledx, scaledy, SCALE - 1, SCALE - 1);
+  rect(scaledx, scaledy, SCALE, SCALE);
 }
 
 void drawGLine(OscMessage theOscMessage) {
@@ -329,6 +340,7 @@ void drawKnobs(OscMessage theOscMessage) {
   knob3.setValue(getFloatFromOscArg(theOscMessage, 2));
   knob4.setValue(getFloatFromOscArg(theOscMessage, 3));
   volume.setValue(getFloatFromOscArg(theOscMessage, 4));
+  println("volume: " + getFloatFromOscArg(theOscMessage, 4));
 }
 
 float getFloatFromOscArg(OscMessage theOscMessage, int index) {

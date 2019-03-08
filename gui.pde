@@ -14,72 +14,80 @@
  * =========================================================
  */
 
-public void knob1_turn1(GKnob source, GEvent event) { //_CODE_:knob1:980939:
+public void knob1_turn1(CustomGKnob source, GEvent event) { //_CODE_:knob1:211997:
   if (!disableKnob1Callback) {
     sendKnobs();
   } else {
     disableKnob1Callback = false;
   }
-} //_CODE_:knob1:980939:
+} //_CODE_:knob1:211997:
 
-public void knob2_turn1(GKnob source, GEvent event) { //_CODE_:knob2:408622:
+public void knob2_turn1(CustomGKnob source, GEvent event) { //_CODE_:knob2:730496:
   if (!disableKnob2Callback) {
     sendKnobs();
   } else {
     disableKnob2Callback = false;
   }
-} //_CODE_:knob2:408622:
+} //_CODE_:knob2:730496:
 
-public void knob3_turn1(GKnob source, GEvent event) { //_CODE_:knob3:639422:
+public void knob3_turn1(CustomGKnob source, GEvent event) { //_CODE_:knob3:210654:
   if (!disableKnob3Callback) {
     sendKnobs();
   } else {
     disableKnob3Callback = false;
   }
-} //_CODE_:knob3:639422:
+} //_CODE_:knob3:210654:
 
-public void knob4_turn1(GKnob source, GEvent event) { //_CODE_:knob4:870334:
+public void knob4_turn1(CustomGKnob source, GEvent event) { //_CODE_:knob4:438080:
   if (!disableKnob4Callback) {
     sendKnobs();
   } else {
     disableKnob4Callback = false;
   }
-} //_CODE_:knob4:870334:
+} //_CODE_:knob4:438080:
 
-public void aux_click1(GButton source, GEvent event) { //_CODE_:aux:926986:
+public void aux_click1(GButton source, GEvent event) { //_CODE_:aux:269587:
   if (event == GEvent.PRESSED) {
     sendAux(100);
-  } else if (event == GEvent.CLICKED) {
+  } else if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
     sendAux(0);
   }
-} //_CODE_:aux:926986:
+} //_CODE_:aux:269587:
 
-public void up_click1(GButton source, GEvent event) { //_CODE_:up:236270:
-  if (patchList) {
-    previousPatch();
-  } else if (enablePatchSub) {
-    sendEncoderTurn(0);
-  } else {
-    println("up");
-    patchListMode();
+public void fs_click1(GButton source, GEvent event) { //_CODE_:fs:706957:
+  println("button2 - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:fs:706957:
+
+public void up_click1(GButton source, GEvent event) { //_CODE_:up:717920:
+  if (event == GEvent.PRESSED) {
+    if (patchList) {
+      previousPatch();
+    } else if (enablePatchSub) {
+      sendEncoderTurn(0);
+    } else {
+      println("up");
+      patchListMode();
+    }
   }
-} //_CODE_:up:236270:
+} //_CODE_:up:717920:
 
-public void down_click1(GButton source, GEvent event) { //_CODE_:down:668743:
-  if (patchList) {
-    nextPatch();
-  } else if (enablePatchSub) {
-    sendEncoderTurn(1);
-  } else {
-    println("down");
-    patchListMode();
+public void down_click1(GButton source, GEvent event) { //_CODE_:down:818963:
+  if (event == GEvent.PRESSED) {
+    if (patchList) {
+      nextPatch();
+    } else if (enablePatchSub) {
+      sendEncoderTurn(1);
+    } else {
+      println("down");
+      patchListMode();
+    }
   }
-} //_CODE_:down:668743:
+} //_CODE_:down:818963:
 
-public void select_click1(GButton source, GEvent event) { //_CODE_:select:311979:
-  if (patchList) { //<>//
+public void select_click1(GButton source, GEvent event) { //_CODE_:select:600355:
+  if (patchList) {
     println("select patchList");
-    if (event == GEvent.CLICKED) {
+    if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
       println("select patchList CLICKED");
       selectPatch();
     }
@@ -87,25 +95,37 @@ public void select_click1(GButton source, GEvent event) { //_CODE_:select:311979
     println("select enablePatchSub");
     if (event == GEvent.PRESSED) {
       //sendEncoderButton(1);
-    } else if (event == GEvent.CLICKED) {
+    } else if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
       sendEncoderButton(1);
       //sendEncoderButton(0);
     }
   } else {
-    if (event == GEvent.CLICKED) {
+    if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
       println("select");
       patchListMode();
     }
   }
-} //_CODE_:select:311979:
+} //_CODE_:select:600355:
 
-public void volume_turn1(GKnob source, GEvent event) { //_CODE_:volume:710386:
+public void expr_turn1(CustomGKnob source, GEvent event) { //_CODE_:expr:359660:
+  println("knob5 - GKnob >> GEvent." + event + " @ " + millis());
+} //_CODE_:expr:359660:
+
+public void load_click1(GButton source, GEvent event) { //_CODE_:load:838972:
+  println("button1 - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:load:838972:
+
+public void volume_turn1(CustomGKnob source, GEvent event) { //_CODE_:volume:299973:
   if (!disableVolumeCallback) {
     sendKnobs();
   } else {
     disableVolumeCallback = false;
   }
-} //_CODE_:volume:710386:
+} //_CODE_:volume:299973:
+
+public void save_click1(GButton source, GEvent event) { //_CODE_:save_button:799425:
+  println("button1 - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:save_button:799425:
 
 
 
@@ -113,96 +133,146 @@ public void volume_turn1(GKnob source, GEvent event) { //_CODE_:volume:710386:
 // autogenerated do not edit
 public void createGUI(){
   G4P.messagesEnabled(false);
-  G4P.setGlobalColorScheme(GCScheme.CYAN_SCHEME);
-  G4P.setCursor(ARROW);
-  surface.setTitle("Sketch Window");
-  knob1 = new GKnob(this, 20, 230, 70, 70, 0.8);
+  G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
+  G4P.setMouseOverEnabled(false);
+  surface.setTitle("Organelle");
+  knob1 = new CustomGKnob(this, 20, 210, 60, 60, 0.8);
   knob1.setTurnRange(110, 70);
-  knob1.setTurnMode(GKnob.CTRL_ANGULAR);
+  knob1.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob1.setSensitivity(1);
   knob1.setShowArcOnly(false);
   knob1.setOverArcOnly(false);
   knob1.setIncludeOverBezel(false);
   knob1.setShowTrack(true);
-  knob1.setLimits(511.0, 0.0, 1023.0);
+  knob1.setLimits(0.5, 0.0, 1023.0);
   knob1.setShowTicks(true);
-  knob1.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   knob1.setOpaque(false);
   knob1.addEventHandler(this, "knob1_turn1");
-  knob2 = new GKnob(this, 110, 230, 70, 70, 0.8);
+  knob2 = new CustomGKnob(this, 92, 210, 60, 60, 0.8);
   knob2.setTurnRange(110, 70);
-  knob2.setTurnMode(GKnob.CTRL_ANGULAR);
+  knob2.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob2.setSensitivity(1);
   knob2.setShowArcOnly(false);
   knob2.setOverArcOnly(false);
   knob2.setIncludeOverBezel(false);
   knob2.setShowTrack(true);
-  knob2.setLimits(511.0, 0.0, 1023.0);
+  knob2.setLimits(0.5, 0.0, 1023.0);
   knob2.setShowTicks(true);
-  knob2.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   knob2.setOpaque(false);
   knob2.addEventHandler(this, "knob2_turn1");
-  knob3 = new GKnob(this, 200, 230, 70, 70, 0.8);
+  knob3 = new CustomGKnob(this, 166, 210, 60, 60, 0.8);
   knob3.setTurnRange(110, 70);
-  knob3.setTurnMode(GKnob.CTRL_ANGULAR);
+  knob3.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob3.setSensitivity(1);
   knob3.setShowArcOnly(false);
   knob3.setOverArcOnly(false);
   knob3.setIncludeOverBezel(false);
   knob3.setShowTrack(true);
-  knob3.setLimits(511.0, 0.0, 1023.0);
+  knob3.setLimits(0.5, 0.0, 1023.0);
   knob3.setShowTicks(true);
-  knob3.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   knob3.setOpaque(false);
   knob3.addEventHandler(this, "knob3_turn1");
-  knob4 = new GKnob(this, 290, 230, 70, 70, 0.8);
+  knob4 = new CustomGKnob(this, 240, 210, 60, 60, 0.8);
   knob4.setTurnRange(110, 70);
-  knob4.setTurnMode(GKnob.CTRL_ANGULAR);
+  knob4.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob4.setSensitivity(1);
   knob4.setShowArcOnly(false);
   knob4.setOverArcOnly(false);
   knob4.setIncludeOverBezel(false);
   knob4.setShowTrack(true);
-  knob4.setLimits(511.0, 0.0, 1023.0);
+  knob4.setLimits(0.5, 0.0, 1023.0);
   knob4.setShowTicks(true);
-  knob4.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   knob4.setOpaque(false);
   knob4.addEventHandler(this, "knob4_turn1");
-  aux = new GButton(this, 395, 240, 70, 60);
+  aux = new GButton(this, 68, 396, 64, 64);
   aux.setText("aux");
-  aux.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   aux.addEventHandler(this, "aux_click1");
-  up = new GButton(this, 395, 10, 70, 40);
+  fs = new GButton(this, 188, 396, 64, 64);
+  fs.setText("fs");
+  fs.addEventHandler(this, "fs_click1");
+  up = new GButton(this, 252, 20, 48, 48);
   up.setText("up");
-  up.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   up.addEventHandler(this, "up_click1");
-  down = new GButton(this, 395, 60, 70, 40);
+  down = new GButton(this, 252, 78, 48, 48);
   down.setText("down");
-  down.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   down.addEventHandler(this, "down_click1");
-  select = new GButton(this, 395, 110, 70, 40);
-  select.setText("select");
-  select.setTextBold();
-  select.setLocalColorScheme(GCScheme.CYAN_SCHEME);
+  select = new GButton(this, 252, 136, 48, 48);
+  select.setText("sel");
   select.addEventHandler(this, "select_click1");
-  volume = new GKnob(this, 395, 160, 70, 70, 0.8);
+  expr = new CustomGKnob(this, 166, 290, 60, 60, 0.8);
+  expr.setTurnRange(110, 70);
+  expr.setTurnMode(GKnob.CTRL_VERTICAL);
+  expr.setSensitivity(1);
+  expr.setShowArcOnly(false);
+  expr.setOverArcOnly(false);
+  expr.setIncludeOverBezel(false);
+  expr.setShowTrack(true);
+  expr.setLimits(0.5, 0.0, 1023.0);
+  expr.setShowTicks(true);
+  expr.setOpaque(false);
+  expr.addEventHandler(this, "expr_turn1");
+  load = new GButton(this, 20, 136, 48, 48);
+  load.setText("load");
+  load.addEventHandler(this, "load_click1");
+  volume = new CustomGKnob(this, 240, 290, 60, 60, 0.8);
   volume.setTurnRange(110, 70);
-  volume.setTurnMode(GKnob.CTRL_ANGULAR);
+  volume.setTurnMode(GKnob.CTRL_VERTICAL);
+  volume.setSensitivity(1);
   volume.setShowArcOnly(false);
   volume.setOverArcOnly(false);
   volume.setIncludeOverBezel(false);
   volume.setShowTrack(true);
   volume.setLimits(1023.0, 0.0, 1023.0);
   volume.setShowTicks(true);
-  volume.setLocalColorScheme(GCScheme.CYAN_SCHEME);
   volume.setOpaque(false);
   volume.addEventHandler(this, "volume_turn1");
+  save_button = new GButton(this, 78, 136, 48, 48);
+  save_button.setText("save");
+  save_button.addEventHandler(this, "save_click1");
+  label1 = new GLabel(this, 20, 190, 60, 20);
+  label1.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label1.setText("konb 1");
+  label1.setOpaque(false);
+  label2 = new GLabel(this, 92, 190, 60, 20);
+  label2.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label2.setText("knob 2");
+  label2.setOpaque(false);
+  label3 = new GLabel(this, 166, 190, 60, 20);
+  label3.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label3.setText("knob 3");
+  label3.setOpaque(false);
+  label4 = new GLabel(this, 240, 190, 60, 20);
+  label4.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label4.setText("knob 4");
+  label4.setOpaque(false);
+  label5 = new GLabel(this, 166, 270, 60, 20);
+  label5.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label5.setText("exp");
+  label5.setOpaque(false);
+  label6 = new GLabel(this, 240, 270, 60, 20);
+  label6.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label6.setText("volume");
+  label6.setOpaque(false);
 }
 
 // Variable declarations 
 // autogenerated do not edit
-GKnob knob1; 
-GKnob knob2; 
-GKnob knob3; 
-GKnob knob4; 
+CustomGKnob knob1; 
+CustomGKnob knob2; 
+CustomGKnob knob3; 
+CustomGKnob knob4; 
 GButton aux; 
+GButton fs; 
 GButton up; 
 GButton down; 
 GButton select; 
-GKnob volume; 
+CustomGKnob expr; 
+GButton load; 
+CustomGKnob volume; 
+GButton save_button; 
+GLabel label1; 
+GLabel label2; 
+GLabel label3; 
+GLabel label4; 
+GLabel label5; 
+GLabel label6; 

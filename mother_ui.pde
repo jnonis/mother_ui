@@ -1,11 +1,15 @@
+import controlP5.*;
 import oscP5.*;
 import netP5.*;
 import g4p_controls.*;
 import java.util.Queue;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.lang.Process;
 
-static final String ROOT = "/Users/jnonis/dev/pure_data/Organelle_Patches";
-static final int SCALE = 480 / 128;
+static final String ROOT = "/home/pi/pd/organelle/Organelle_Patches";
+static final int SCALE = 2; //480 / 128;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -30,42 +34,65 @@ boolean disableKnob4Callback = false;
 boolean disableVolumeCallback = false;
 
 void setup() {
-  size(480,320);
-  frameRate(25);
+  //size(320,480);
+  fullScreen();
   
   meesages = new ConcurrentLinkedQueue();
   /* start oscP5, listening for incoming messages at port 4001 */
   oscP5 = new OscP5(this,4001);
-  /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
-   * an ip address and a port number. myRemoteLocation is used as parameter in
-   * oscP5.send() when sending osc packets to another computer, device, 
-   * application. usage see below. for testing purposes the listening port
-   * and the port of the remote location address are the same, hence you will
-   * send messages back to this sketch.
-   */
   myRemoteLocation = new NetAddress("127.0.0.1",4000);
   
-  background(0);
-  fill(0, 130, 130);
-  noStroke();
-  rect(0, 212, 480, 320);
-  rect(384, 0, 480, 212);
+  background(237, 237, 237);
+  //fill(0, 130, 130);
+  //noStroke();
+  //rect(0, 212, 480, 320);
+  //rect(384, 0, 480, 212);
   
+  // Led
+  fill(0);
+  noStroke();
+  rect(192, 136, 48, 48);
+  
+  //createNewGUI();
   createGUI();
-  aux.fireAllEvents(true);
+  up.fireAllEvents(true);
+  down.fireAllEvents(true);
   select.fireAllEvents(true);
+  load.fireAllEvents(true);
+  save_button.fireAllEvents(true);
+  aux.fireAllEvents(true);
+  fs.fireAllEvents(true);
+  volume.setValue(1023);
+  
+  execPd();
   
   patches = listFile(ROOT);
   drawPatches();
 }
 
 void draw() {
-  while (!meesages.isEmpty()) {
+  int count = 0;
+  while (!meesages.isEmpty() && count < 15) {
     OscMessage theOscMessage = meesages.poll();
     if (theOscMessage != null) {
       handleOscEvent(theOscMessage);
+      count++;
     }
   }
+}
+
+void execPd() {
+  Process p = exec("/home/pi/audio-sw/pd-mother-rpi/run-rpi.sh");
+  try {
+    p.waitFor();
+  } catch (InterruptedException e) { }
+}
+
+void killPd() {
+  Process p = exec("killall pd");
+  try {
+    p.waitFor();
+  } catch (InterruptedException e) { }
 }
 
 /* incoming osc message are forwarded to the oscEvent method. */
@@ -79,7 +106,11 @@ void handleOscEvent(OscMessage theOscMessage) {
   // /patchLoaded
   // ---
   // /gohome
-  if(theOscMessage.checkAddrPattern("/oled/vumeter")==true) {
+  if (!theOscMessage.checkAddrPattern("/oled/vumeter")) {
+    //println(" addrpattern: "+theOscMessage.addrPattern());
+  }
+  
+  if(theOscMessage.checkAddrPattern("/oled/vumeter")) {
     if (!patchList) {
       drawVumeter(theOscMessage);
     }
@@ -128,9 +159,9 @@ void handleOscEvent(OscMessage theOscMessage) {
     drawKnobs(theOscMessage);
   } else {
     /* print the address pattern and the typetag of the received OscMessage */
-    print("### received an osc message.");
-    print(" addrpattern: "+theOscMessage.addrPattern());
-    println(" typetag: "+theOscMessage.typetag());
+    //print("### received an osc message.");
+    //print(" addrpattern: "+theOscMessage.addrPattern());
+    //println(" typetag: "+theOscMessage.typetag());
   }
 }
 
@@ -141,6 +172,9 @@ void patchListMode() {
 }
 
 void drawPatches() {
+  fill(0);
+  noStroke();
+  rect(0, 0, 240, 128);
   if (patchLoadedIndex >= 0) {
     drawLine(0, "> " + patches[patchLoadedIndex].getName());
   }
