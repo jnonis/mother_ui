@@ -139,6 +139,12 @@ public void save_click1(GButton source, GEvent event) { //_CODE_:save_button:799
   }
 } //_CODE_:save_button:799425:
 
+public void open_click1(GButton source, GEvent event) { //_CODE_:open_button:509201:
+  if (event == GEvent.PRESSED) {
+    openPatch();
+  }
+} //_CODE_:open_button:509201:
+
 
 
 // Create all the GUI controls. 
@@ -156,7 +162,7 @@ public void createGUI(){
   knob1.setOverArcOnly(false);
   knob1.setIncludeOverBezel(false);
   knob1.setShowTrack(true);
-  knob1.setLimits(0.5, 0.0, 1023.0);
+  knob1.setLimits(0.0, 0.0, 1023.0);
   knob1.setShowTicks(true);
   knob1.setOpaque(false);
   knob1.addEventHandler(this, "knob1_turn1");
@@ -168,7 +174,7 @@ public void createGUI(){
   knob2.setOverArcOnly(false);
   knob2.setIncludeOverBezel(false);
   knob2.setShowTrack(true);
-  knob2.setLimits(0.5, 0.0, 1023.0);
+  knob2.setLimits(0.0, 0.0, 1023.0);
   knob2.setShowTicks(true);
   knob2.setOpaque(false);
   knob2.addEventHandler(this, "knob2_turn1");
@@ -180,7 +186,7 @@ public void createGUI(){
   knob3.setOverArcOnly(false);
   knob3.setIncludeOverBezel(false);
   knob3.setShowTrack(true);
-  knob3.setLimits(0.5, 0.0, 1023.0);
+  knob3.setLimits(0.0, 0.0, 1023.0);
   knob3.setShowTicks(true);
   knob3.setOpaque(false);
   knob3.addEventHandler(this, "knob3_turn1");
@@ -192,7 +198,7 @@ public void createGUI(){
   knob4.setOverArcOnly(false);
   knob4.setIncludeOverBezel(false);
   knob4.setShowTrack(true);
-  knob4.setLimits(0.5, 0.0, 1023.0);
+  knob4.setLimits(0.0, 0.0, 1023.0);
   knob4.setShowTicks(true);
   knob4.setOpaque(false);
   knob4.addEventHandler(this, "knob4_turn1");
@@ -219,11 +225,11 @@ public void createGUI(){
   expr.setOverArcOnly(false);
   expr.setIncludeOverBezel(false);
   expr.setShowTrack(true);
-  expr.setLimits(0.5, 0.0, 1023.0);
+  expr.setLimits(0.0, 0.0, 1023.0);
   expr.setShowTicks(true);
   expr.setOpaque(false);
   expr.addEventHandler(this, "expr_turn1");
-  load = new GButton(this, 20, 136, 48, 48);
+  load = new GButton(this, 78, 136, 48, 48);
   load.setText("load");
   load.addEventHandler(this, "load_click1");
   volume = new CustomGKnob(this, 240, 290, 60, 60, 0.8);
@@ -238,7 +244,7 @@ public void createGUI(){
   volume.setShowTicks(true);
   volume.setOpaque(false);
   volume.addEventHandler(this, "volume_turn1");
-  save_button = new GButton(this, 78, 136, 48, 48);
+  save_button = new GButton(this, 136, 136, 48, 48);
   save_button.setText("save");
   save_button.addEventHandler(this, "save_click1");
   label1 = new GLabel(this, 20, 190, 60, 20);
@@ -265,6 +271,9 @@ public void createGUI(){
   label6.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label6.setText("volume");
   label6.setOpaque(false);
+  open_button = new GButton(this, 20, 136, 48, 48);
+  open_button.setText("open");
+  open_button.addEventHandler(this, "open_click1");
 }
 
 // Variable declarations 
@@ -288,3 +297,4 @@ GLabel label3;
 GLabel label4; 
 GLabel label5; 
 GLabel label6; 
+GButton open_button; 

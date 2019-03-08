@@ -39,3 +39,13 @@ File[] listFile(String dir) {
     return new File[0];
   }
 }
+
+void openPatch() {
+  selectInput("Select a patch:", "patchSelected");
+}
+
+void patchSelected(File selection) {
+  if (selection != null) {
+    sendLoadPatch(selection.getAbsolutePath());
+  }
+}

@@ -59,6 +59,7 @@ void setup() {
   up.fireAllEvents(true);
   down.fireAllEvents(true);
   select.fireAllEvents(true);
+  open_button.fireAllEvents(true);
   load.fireAllEvents(true);
   save_button.fireAllEvents(true);
   aux.fireAllEvents(true);
