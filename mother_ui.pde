@@ -8,12 +8,22 @@ import java.util.Comparator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.lang.Process;
 
+static final boolean DEV = false;
 static final String ROOT = "/home/pi/pd/organelle/Organelle_Patches";
-static final int SCALE = 2; //480 / 128;
 
+// GPIO
+static final int CONTROL_MODE_KNOBS = 0;
+static final int CONTROL_MODE_MENU = 1;
+GPIOControl control;
+int controlMode = CONTROL_MODE_KNOBS;
+
+// GUI
+Oled oled;
+Led led;
+
+// OSC
 OscP5 oscP5;
 NetAddress myRemoteLocation;
-Queue<OscMessage> meesages;
 
 /** Status. */
 boolean patchList = true;
@@ -27,18 +37,14 @@ int patchIndex = 0;
 int patchSelected = 0;
 int patchLoadedIndex = -1;
 
-boolean disableKnob1Callback = false;
-boolean disableKnob2Callback = false;
-boolean disableKnob3Callback = false;
-boolean disableKnob4Callback = false;
-boolean disableVolumeCallback = false;
-boolean disableExprCallback = false;
+long openPressedTime = 0;
 
 void setup() {
   //size(320,480);
   fullScreen();
+  frameRate(15);
+  noCursor();
   
-  meesages = new ConcurrentLinkedQueue();
   /* start oscP5, listening for incoming messages at port 4001 */
   oscP5 = new OscP5(this,4001);
   myRemoteLocation = new NetAddress("127.0.0.1",4000);
@@ -49,12 +55,14 @@ void setup() {
   //rect(0, 212, 480, 320);
   //rect(384, 0, 480, 212);
   
-  // Led
-  fill(0);
-  noStroke();
-  rect(192, 136, 48, 48);
+  // Init GPIO control
+  control = new GPIOControl();
+  control.attachEncoderListener(this, "handleEncoders");
+  control.attachButtonListener(this, "handleButtons");
   
   //createNewGUI();
+  oled = new Oled();
+  led = new Led(192, 136, 46);
   createGUI();
   up.fireAllEvents(true);
   down.fireAllEvents(true);
@@ -66,164 +74,128 @@ void setup() {
   fs.fireAllEvents(true);
   volume.setValue(1023);
   
-  execPd();
-  
   patches = listFile(ROOT);
-  drawPatches();
+  
+  execPd();
 }
 
 void draw() {
-  int count = 0;
-  while (!meesages.isEmpty() && count < 15) {
-    OscMessage theOscMessage = meesages.poll();
-    if (theOscMessage != null) {
-      handleOscEvent(theOscMessage);
-      count++;
-    }
-  }
+  oled.draw(this);
+  led.draw(this);
 }
 
 void execPd() {
-  Process p = exec("/home/pi/audio-sw/pd-mother-rpi/run-rpi.sh");
+  String cmd = "/home/pi/audio-sw/pd-mother-rpi/run-rpi.sh";
+  String param = "";
+  if (!DEV) {
+    param = "-nogui";
+  }
+  Process p = exec(cmd, param);
   try {
     p.waitFor();
   } catch (InterruptedException e) { }
+  drawPatches();
+  patchLoadedIndex = -1;
 }
 
-void killPd() {
-  Process p = exec("killall pd");
-  try {
-    p.waitFor();
-  } catch (InterruptedException e) { }
-}
-
-/* incoming osc message are forwarded to the oscEvent method. */
+/* Incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage theOscMessage) {
-  meesages.add(theOscMessage);
+  //meesages.add(theOscMessage);
+  handleOscEvent(theOscMessage);
   redraw();
 }
 
-void handleOscEvent(OscMessage theOscMessage) {
-  // /enablepatchsub
-  // /patchLoaded
-  // ---
-  // /gohome
-  if (!theOscMessage.checkAddrPattern("/oled/vumeter")) {
-    //println(" addrpattern: "+theOscMessage.addrPattern());
-  }
-  
-  if(theOscMessage.checkAddrPattern("/oled/vumeter")) {
-    if (!patchList) {
-      drawVumeter(theOscMessage);
-    }
-  } else if(theOscMessage.addrPattern().startsWith("/oled/line/")) {
-    drawLine(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/invertline")) {
-    drawInvertLine(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/led")) {
-    drawLed(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gClear")) {
-    drawGClear();
-  } else if(theOscMessage.checkAddrPattern("/oled/gSetPixel")) {
-    drawGSetPixel(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gLine")) {
-    drawGLine(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gInvertArea")) {
-    drawGInvertArea(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gFlip")) {
-    // TODO
-  } else if(theOscMessage.checkAddrPattern("/oled/gPrintln")) {
-    drawGPrintln(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gWaveform")) {
-    drawGWaveform(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gShowInfoBar")) {
-    drawGShowInfoBar(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gFillArea")) {
-    drawGFillArea(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/oled/gBox")) {
-    drawGBox(theOscMessage);
-  } else if(theOscMessage.checkAddrPattern("/patchLoaded")) {
-    // TODO
-    if (theOscMessage.get(0).intValue() == 1) {
-      patchLoaded = true;
-    } else {
-      patchLoaded = false;
-    }
-  } else if(theOscMessage.checkAddrPattern("/enablepatchsub")) {
-    if (theOscMessage.get(0).intValue() == 1) {
-      enablePatchSub = true;
-    } else {
-      enablePatchSub = false;
-    }
-  } else if(theOscMessage.checkAddrPattern("/gohome")) {
-    patchListMode();
-  } else if(theOscMessage.checkAddrPattern("/knobs")) {
-    drawKnobs(theOscMessage);
-  } else {
-    /* print the address pattern and the typetag of the received OscMessage */
-    //print("### received an osc message.");
-    //print(" addrpattern: "+theOscMessage.addrPattern());
-    //println(" typetag: "+theOscMessage.typetag());
-  }
-}
-
-void patchListMode() {
-  println("patchListMode");
-  patchList = true;
-  drawPatches();
-}
-
-void drawPatches() {
-  fill(0);
-  noStroke();
-  rect(0, 0, 240, 128);
-  if (patchLoadedIndex >= 0) {
-    drawLine(0, "> " + patches[patchLoadedIndex].getName());
-  }
-  for (int i = 0; i < 5; i++) {
-    drawLine(i + 1, patches[patchIndex + i].getName());
-  }
-  drawInvertLine(patchSelected - patchIndex + 1);
-}
-
-void previousPatch() {
-  patchSelected--;
-  if (patchSelected < 0) {
-    patchSelected = 0;
-  }
-  if (patchSelected < patchIndex) {
-    patchIndex--;
-  }
-  drawPatches();
-}
-
-void nextPatch() {
-  patchSelected++;
-  if (patchSelected >= patches.length) {
-    patchSelected = patches.length - 1;
-  }
-  if (patchSelected > patchIndex + 4) {
-    patchIndex++;
-  }
-  drawPatches();
-}
-
-void selectPatch() {
-  patchList = false;
-  if (patchSelected != patchLoadedIndex) {
-    patchLoadedIndex = patchSelected;
-    if (patches.length > 0) {
-      File mainPd = getMainPd(patches[patchLoadedIndex]);
-      if (mainPd != null) {
-        showInfoBar = true;
-        enablePatchSub = false;
-        patchLoaded = false;
-        sendLoadPatch(mainPd.getAbsolutePath());
+void handleEncoders(int i, final int value) {
+  switch(i) {
+    case 0:
+      if (controlMode == CONTROL_MODE_KNOBS) {
+        knob1.setValue(knob1.getValue() + value);
+      } else {
+        if (value > 0) {
+          handleDown();
+        } else if (value < 0) {
+          handleUp();
+        }
       }
+      break;
+    case 1:
+      knob2.setValue(knob2.getValue() + value);
+      break;
+    case 2:
+      knob3.setValue(knob3.getValue() + value);
+      break;
+    case 3:
+      knob4.setValue(knob4.getValue() + value);
+      break;
+  }
+  redraw();
+}
+
+void handleButtons(int i, final int value) {
+  switch(i) {
+    case 0:
+      if (controlMode == CONTROL_MODE_MENU) {
+        handleSelect(value);
+      }
+      break;
+    case 1:
+    case 2:
+      break;
+    case 3:
+      if (value == 1) {
+        controlMode = controlMode == CONTROL_MODE_KNOBS ? CONTROL_MODE_MENU : CONTROL_MODE_KNOBS;
+      }
+      break;
+    case 4:
+      sendAux(value * 100);
+      break;
+    case 5:
+      sendFs(value * 100);
+      break;
+  }
+}
+
+void handleUp() {
+  if (patchList) {
+    previousPatch();
+  } else if (enablePatchSub) {
+    sendEncoderTurn(0);
+  } else {
+    println("up");
+    patchListMode();
+  }
+}
+
+void handleDown() {
+  if (patchList) {
+    nextPatch();
+  } else if (enablePatchSub) {
+    sendEncoderTurn(1);
+  } else {
+    println("down");
+    patchListMode();
+  }
+}
+
+void handleSelect(int state) {
+  if (patchList) {
+    println("select patchList");
+    if (state == 0) {
+      println("select patchList CLICKED");
+      selectPatch();
+    }
+  } else if (enablePatchSub) {
+    println("select enablePatchSub");
+    if (state == 1) {
+      //sendEncoderButton(1);
+    } else if (state == 0) {
+      sendEncoderButton(1);
+      //sendEncoderButton(0);
     }
   } else {
-    for (int i = 0; i < 6; i++) {
-      drawLine(i, "");
+    if (state == 0) {
+      println("select");
+      patchListMode();
     }
   }
 }

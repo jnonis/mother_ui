@@ -64,27 +64,13 @@ public void fs_click1(GButton source, GEvent event) { //_CODE_:fs:706957:
 
 public void up_click1(GButton source, GEvent event) { //_CODE_:up:717920:
   if (event == GEvent.PRESSED) {
-    if (patchList) {
-      previousPatch();
-    } else if (enablePatchSub) {
-      sendEncoderTurn(0);
-    } else {
-      println("up");
-      patchListMode();
-    }
+    handleUp();
   }
 } //_CODE_:up:717920:
 
 public void down_click1(GButton source, GEvent event) { //_CODE_:down:818963:
   if (event == GEvent.PRESSED) {
-    if (patchList) {
-      nextPatch();
-    } else if (enablePatchSub) {
-      sendEncoderTurn(1);
-    } else {
-      println("down");
-      patchListMode();
-    }
+    handleDown();
   }
 } //_CODE_:down:818963:
 
@@ -141,7 +127,13 @@ public void save_click1(GButton source, GEvent event) { //_CODE_:save_button:799
 
 public void open_click1(GButton source, GEvent event) { //_CODE_:open_button:509201:
   if (event == GEvent.PRESSED) {
-    openPatch();
+    openPressedTime = millis();
+  } else if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
+    if (millis() > openPressedTime + 3000) {
+      execPd();
+    } else {
+      openPatch();
+    }
   }
 } //_CODE_:open_button:509201:
 
@@ -156,7 +148,7 @@ public void createGUI(){
   surface.setTitle("Organelle");
   knob1 = new CustomGKnob(this, 20, 210, 60, 60, 0.8);
   knob1.setTurnRange(110, 70);
-  knob1.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob1.setTurnMode(CustomGKnob.CTRL_VERTICAL);
   knob1.setSensitivity(1);
   knob1.setShowArcOnly(false);
   knob1.setOverArcOnly(false);
@@ -168,7 +160,7 @@ public void createGUI(){
   knob1.addEventHandler(this, "knob1_turn1");
   knob2 = new CustomGKnob(this, 92, 210, 60, 60, 0.8);
   knob2.setTurnRange(110, 70);
-  knob2.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob2.setTurnMode(CustomGKnob.CTRL_VERTICAL);
   knob2.setSensitivity(1);
   knob2.setShowArcOnly(false);
   knob2.setOverArcOnly(false);
@@ -180,7 +172,7 @@ public void createGUI(){
   knob2.addEventHandler(this, "knob2_turn1");
   knob3 = new CustomGKnob(this, 166, 210, 60, 60, 0.8);
   knob3.setTurnRange(110, 70);
-  knob3.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob3.setTurnMode(CustomGKnob.CTRL_VERTICAL);
   knob3.setSensitivity(1);
   knob3.setShowArcOnly(false);
   knob3.setOverArcOnly(false);
@@ -192,7 +184,7 @@ public void createGUI(){
   knob3.addEventHandler(this, "knob3_turn1");
   knob4 = new CustomGKnob(this, 240, 210, 60, 60, 0.8);
   knob4.setTurnRange(110, 70);
-  knob4.setTurnMode(GKnob.CTRL_VERTICAL);
+  knob4.setTurnMode(CustomGKnob.CTRL_VERTICAL);
   knob4.setSensitivity(1);
   knob4.setShowArcOnly(false);
   knob4.setOverArcOnly(false);
@@ -208,18 +200,18 @@ public void createGUI(){
   fs = new GButton(this, 188, 396, 64, 64);
   fs.setText("fs");
   fs.addEventHandler(this, "fs_click1");
-  up = new GButton(this, 252, 20, 48, 48);
+  up = new GButton(this, 262, 15, 48, 48);
   up.setText("up");
   up.addEventHandler(this, "up_click1");
-  down = new GButton(this, 252, 78, 48, 48);
+  down = new GButton(this, 262, 75, 48, 48);
   down.setText("down");
   down.addEventHandler(this, "down_click1");
-  select = new GButton(this, 252, 136, 48, 48);
+  select = new GButton(this, 262, 136, 48, 48);
   select.setText("sel");
   select.addEventHandler(this, "select_click1");
   expr = new CustomGKnob(this, 166, 290, 60, 60, 0.8);
   expr.setTurnRange(110, 70);
-  expr.setTurnMode(GKnob.CTRL_VERTICAL);
+  expr.setTurnMode(CustomGKnob.CTRL_VERTICAL);
   expr.setSensitivity(1);
   expr.setShowArcOnly(false);
   expr.setOverArcOnly(false);
@@ -234,7 +226,7 @@ public void createGUI(){
   load.addEventHandler(this, "load_click1");
   volume = new CustomGKnob(this, 240, 290, 60, 60, 0.8);
   volume.setTurnRange(110, 70);
-  volume.setTurnMode(GKnob.CTRL_VERTICAL);
+  volume.setTurnMode(CustomGKnob.CTRL_VERTICAL);
   volume.setSensitivity(1);
   volume.setShowArcOnly(false);
   volume.setOverArcOnly(false);

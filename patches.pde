@@ -41,11 +41,13 @@ File[] listFile(String dir) {
 }
 
 void openPatch() {
-  selectInput("Select a patch:", "patchSelected");
+  selectInput("Select a patch:", "patchSelected", new File("/home/pi/pd/organelle/Organelle_Patches/"));
 }
 
 void patchSelected(File selection) {
   if (selection != null) {
+    patchList = false;
+    oled.clearOled();
     sendLoadPatch(selection.getAbsolutePath());
   }
 }
