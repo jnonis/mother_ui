@@ -131,6 +131,8 @@ public void open_click1(GButton source, GEvent event) { //_CODE_:open_button:509
   } else if (event == GEvent.RELEASED || event == GEvent.CLICKED) {
     if (millis() > openPressedTime + 3000) {
       execPd();
+      drawPatches();
+      patchLoadedIndex = -1;
     } else {
       openPatch();
     }

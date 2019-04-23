@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.lang.Process;
 
-static final boolean DEV = false;
+static final boolean DEV = true;
 static final String ROOT = "/home/pi/pd/organelle/Organelle_Patches";
 
 // GPIO
@@ -75,8 +75,8 @@ void setup() {
   volume.setValue(1023);
   
   patches = listFile(ROOT);
-  
-  execPd();
+  drawPatches();
+  patchLoadedIndex = -1;
 }
 
 void draw() {
@@ -86,16 +86,29 @@ void draw() {
 
 void execPd() {
   String cmd = "/home/pi/audio-sw/pd-mother-rpi/run-rpi.sh";
+  //String cmd = "/home/pi/pd/organelle/orac-2.0/orac/run.sh";
   String param = "";
   if (!DEV) {
-    param = "-nogui";
+    param = "-nogui ";
   }
   Process p = exec(cmd, param);
   try {
     p.waitFor();
   } catch (InterruptedException e) { }
-  drawPatches();
-  patchLoadedIndex = -1;
+}
+
+void execPd(String patch) {
+  //String cmd = "/home/pi/pd/organelle/orac-2.0/orac/run.sh";
+  //String cmd = "/home/pi/pd/organelle/More_Patches/orac/run.sh";
+  String cmd = "/home/pi/audio-sw/pd-mother-rpi/run-patch-rpi.sh";
+  String param = patch;
+  if (!DEV) {
+    param = "-nogui " + param ;
+  }
+  Process p = exec(cmd, param);
+  try {
+    p.waitFor();
+  } catch (InterruptedException e) { }
 }
 
 /* Incoming osc message are forwarded to the oscEvent method. */
@@ -106,6 +119,7 @@ void oscEvent(OscMessage theOscMessage) {
 }
 
 void handleEncoders(int i, final int value) {
+  println("Encoder " + i + ": " + value);
   switch(i) {
     case 0:
       if (controlMode == CONTROL_MODE_KNOBS) {
@@ -136,6 +150,8 @@ void handleButtons(int i, final int value) {
     case 0:
       if (controlMode == CONTROL_MODE_MENU) {
         handleSelect(value);
+      } else if (value == 0) {
+        controlMode = CONTROL_MODE_MENU;
       }
       break;
     case 1:
@@ -143,7 +159,7 @@ void handleButtons(int i, final int value) {
       break;
     case 3:
       if (value == 1) {
-        controlMode = controlMode == CONTROL_MODE_KNOBS ? CONTROL_MODE_MENU : CONTROL_MODE_KNOBS;
+        controlMode = CONTROL_MODE_KNOBS;
       }
       break;
     case 4:
@@ -177,25 +193,29 @@ void handleDown() {
   }
 }
 
+boolean selectPressed = false;
+
 void handleSelect(int state) {
   if (patchList) {
     println("select patchList");
-    if (state == 0) {
+    if (selectPressed && state == 0) {
       println("select patchList CLICKED");
       selectPatch();
     }
   } else if (enablePatchSub) {
     println("select enablePatchSub");
     if (state == 1) {
-      //sendEncoderButton(1);
-    } else if (state == 0) {
       sendEncoderButton(1);
-      //sendEncoderButton(0);
+    } else if (state == 0) {
+      sendEncoderButton(0);
     }
   } else {
-    if (state == 0) {
+    if (selectPressed && state == 0) {
       println("select");
       patchListMode();
     }
+  }
+  if (state == 1) {
+    selectPressed = true;
   }
 }

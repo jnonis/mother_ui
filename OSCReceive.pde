@@ -41,7 +41,7 @@ void handleOscEvent(OscMessage theOscMessage) {
     oled.drawGFilledCircle(theOscMessage);
   } else if(!patchList && theOscMessage.checkAddrPattern("/patchLoaded")) {
     // TODO
-    if (theOscMessage.get(0).intValue() == 1) {
+    if (theOscMessage.get(0).intValue() == 1) { //<>//
       patchLoaded = true;
     } else {
       patchLoaded = false;

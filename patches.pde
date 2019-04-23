@@ -48,6 +48,11 @@ void patchSelected(File selection) {
   if (selection != null) {
     patchList = false;
     oled.clearOled();
-    sendLoadPatch(selection.getAbsolutePath());
+    loadPatch(selection.getAbsolutePath());
   }
+}
+
+void loadPatch(String patch) {
+  //sendLoadPatch(patch);
+  execPd(patch);
 }

@@ -17,6 +17,11 @@ public class Oled {
     for (int i = 0; i < pages.length; i++) {
       pages[i] = createGraphics(WIDTH, HEIGHT);
       pages[i].noSmooth();
+      pages[i].beginDraw();
+      pages[i].fill(0);
+      pages[i].noStroke();
+      pages[i].rect(0, 0, WIDTH, HEIGHT);
+      pages[i].endDraw();
     }
     canvas = pages[MAIN];
   }

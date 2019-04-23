@@ -2,6 +2,7 @@
 void patchListMode() {
   println("patchListMode");
   patchList = true;
+  selectPressed = false;
   oled.setPage(Oled.MAIN);
   drawPatches();
 }
@@ -42,6 +43,7 @@ void nextPatch() {
 void selectPatch() {
   patchList = false;
   oled.setPage(Oled.PATCH);
+  controlMode = CONTROL_MODE_KNOBS;
   if (patchSelected != patchLoadedIndex) {
     oled.clearOled();
     patchLoadedIndex = patchSelected;
@@ -51,7 +53,7 @@ void selectPatch() {
         showInfoBar = true;
         enablePatchSub = false;
         patchLoaded = false;
-        sendLoadPatch(mainPd.getAbsolutePath());
+        loadPatch(mainPd.getAbsolutePath());
       }
     }
   }
